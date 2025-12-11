@@ -34,5 +34,5 @@ development/
 old/
 
 # Build artifacts
-resources/*.umd.js
+#resources/*.umd.js
 *.tgz

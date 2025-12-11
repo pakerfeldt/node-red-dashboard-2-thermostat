@@ -196,7 +196,8 @@ export default {
 
 <style scoped>
 /* ==================== COLOR THEME CONFIGURATION ==================== */
-:root {
+/* Note: CSS variables must be on the component root, not :root, for scoped styles */
+.thermostat {
   /* Primary Theme Colors */
   --dial-background-1: #334155;    /* Dial outer gradient start */
   --dial-background-2: #1e293b;    /* Dial outer gradient end */
@@ -229,14 +230,16 @@ export default {
   --shadow-primary: rgba(0, 0, 0, 0.4);
   --shadow-inset-light: rgba(255, 255, 255, 0.05);
   --shadow-inset-dark: rgba(0, 0, 0, 0.4);
-}
 /* ===================================================================== */
 
-.thermostat {
+  /* Component dimensions */
   position: relative;
   width: 280px;
   height: 280px;
   margin: 0 auto;
+  
+  /* Font family for the widget */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .dial {

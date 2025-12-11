@@ -19,9 +19,11 @@
         "name": "Patrik Åkerfeldt",
         "url": "https://github.com/pakerfeldt/node-red-dashboard-2-thermostat"
     },
-    "main": "./resources/ui-thermostat.umd.js",
+    "exports": {
+        "require": "./resources/ui-thermostat.umd.js"
+    },
     "files": [
-        "nodes/*",
+        "nodes/**/*",
         "ui/*",
         "resources/*",
         "examples/*"
