@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Thermostat Widget Test Bed</title>
+    <style>
+        /* ==================== COLOR THEME CONFIGURATION ==================== */
+        :root {
+            /* Primary Theme Colors */
+            --page-background: #0f172a;        /* Very dark slate for main background */
+            --widget-area-bg: #1e293b;         /* Dark slate blue for widget container */
+            --panel-background: #1e293b;       /* Panel background */
+            --panel-border: #334155;           /* Panel borders */
+            --control-group-bg: #334155;       /* Control group backgrounds */
+            
+            /* Active/Accent Colors */
+            --accent-primary: #06b6d4;         /* Bright cyan for active elements */
+            --accent-glow: rgba(6, 182, 212, 0.4); /* Cyan glow effect */
+            --accent-secondary: #0891b2;       /* Slightly darker cyan for interactions */
+            
+            /* Text Colors */
+            --text-primary: #f1f5f9;           /* Primary text (temperature) */
+            --text-secondary: #94a3b8;         /* Secondary text (labels) */
+            --text-muted: #64748b;             /* Muted text (status) */
+            --text-panel-header: #e2e8f0;      /* Panel headers */
+            
+            /* Debug Panel Specific */
+            --input-background: #374151;       /* Input field backgrounds */
+            --input-border: #4b5563;           /* Input field borders */
+            --input-text: #e5e7eb;             /* Input text color */
+            --log-background: #111827;         /* Log area background */
+            --log-text: #9ca3af;               /* Log text color */
+            --log-input: #06b6d4;              /* Log input message color */
+            --log-output: #10b981;             /* Log output message color */
+            --log-error: #ef4444;              /* Log error message color */
+            
+            /* Shadows and Effects */
+            --shadow-primary: rgba(0, 0, 0, 0.4);
+            --shadow-inset-light: rgba(255, 255, 255, 0.05);
+            --shadow-inset-dark: rgba(0, 0, 0, 0.4);
+        }
+        /* ===================================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--page-background);
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+        }
+
+        /* Mimic Node-RED Dashboard v-card structure */
+        .nrdb-ui-group {
+            --layout-columns: 3;
+            --widget-gap: 12px;
+            --widget-row-height: 24px;
+        }
+
+        .v-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .v-card-item {
+            padding: 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .v-card-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .v-card-text {
+            padding: 16px;
+        }
+
+        .nrdb-layout-group--grid {
+            display: grid;
+            grid-template-columns: repeat(min(3, var(--layout-columns)), 1fr);
+            gap: var(--widget-gap);
+        }
+
+        .nrdb-ui-widget {
+            display: grid;
+            grid-template-columns: minmax(0px, 1fr);
+            gap: var(--widget-gap);
+            grid-template-rows: repeat(0, var(--widget-row-height));
+            grid-column-end: span min(3, var(--layout-columns));
+        }
+
+        .debug-panel {
+            background: var(--panel-background);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .debug-panel h2 {
+            margin-bottom: 20px;
+            color: var(--text-panel-header);
+            font-size: 18px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--control-group-bg);
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .input-row:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            min-width: 120px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        input[type="number"], input[type="range"] {
+            flex: 1;
+            padding: 6px 10px;
+            background: var(--input-background);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            color: var(--input-text);
+            font-size: 13px;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 20px;
+        }
+
+        .range-value {
+            min-width: 40px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn:hover {
+            background: var(--accent-secondary);
+        }
+
+        .btn.secondary {
+            background: #334155;
+            color: var(--text-secondary);
+        }
+
+        .btn.secondary:hover {
+            background: #475569;
+            color: var(--text-primary);
+        }
+
+        .log-area {
+            background: var(--log-background);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            padding: 10px;
+            height: 120px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: var(--log-text);
+            margin-top: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 2px;
+            word-break: break-all;
+        }
+
+        .log-entry.input {
+            color: var(--log-input);
+        }
+
+        .log-entry.output {
+            color: var(--log-output);
+        }
+
+        .log-entry.error {
+            color: var(--log-error);
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #475569;
+            margin-right: 8px;
+        }
+
+        .status-indicator.active {
+            background: var(--accent-primary);
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .debug-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mimic Node-RED Dashboard "Sovrum 1" group structure -->
+        <div class="nrdb-ui-group">
+            <div class="v-card">
+                <div class="v-card-item">
+                    <div class="v-card-item__content">
+                        <div class="v-card-title">Vue Thermostat Widget</div>
+                    </div>
+                </div>
+                <div class="v-card-text">
+                    <div class="nrdb-layout-group--grid">
+                        <div class="nrdb-ui-widget nrdb-ui-thermostat" id="app">
+                            <ui-thermostat 
+                                :id="widgetId"
+                                :props="widgetProps"
+                                :state="widgetState"
+                                ref="thermostat"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="debug-panel">
+            <h2><span class="status-indicator" id="statusIndicator"></span>Vue Thermostat Test Bed</h2>
+            
+            <div class="control-group">
+                <h3>Card Width (Grid Columns)</h3>
+
+                <div class="input-row">
+                    <label>Columns:</label>
+                    <input type="range" id="inputGridColumns" min="1" max="6" value="3" step="1">
+                    <span class="range-value" id="columnsValue">3 cols</span>
+                </div>
+
+                <div class="presets" style="margin-top: 10px;">
+                    <button class="btn" onclick="setGridColumns(1)">1 Column (narrow)</button>
+                    <button class="btn" onclick="setGridColumns(2)">2 Columns</button>
+                    <button class="btn" onclick="setGridColumns(3)">3 Columns (default)</button>
+                    <button class="btn" onclick="setGridColumns(4)">4 Columns</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Test Height Constraint (2x2 Widget)</h3>
+
+                <div class="input-row">
+                    <label>Widget Rows:</label>
+                    <input type="range" id="inputWidgetRows" min="0" max="10" value="0" step="1">
+                    <span class="range-value" id="rowsValue">Auto</span>
+                </div>
+
+                <div class="presets" style="margin-top: 10px;">
+                    <button class="btn" onclick="setWidgetRows(0)">Auto (no limit)</button>
+                    <button class="btn" onclick="setWidgetRows(2)">2 Rows (48px)</button>
+                    <button class="btn" onclick="setWidgetRows(4)">4 Rows (96px)</button>
+                    <button class="btn" onclick="setWidgetRows(8)">8 Rows (192px)</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Input Data</h3>
+
+                <div class="input-row">
+                    <label>Current Temp:</label>
+                    <input type="number" id="inputCurrentTemp" step="0.1" min="-10" max="50" value="21.8">
+                    <span>°C</span>
+                </div>
+
+                <div class="input-row">
+                    <label>Target Temp:</label>
+                    <input type="number" id="inputTargetTemp" step="0.5" min="5" max="50" value="22.5">
+                    <span>°C</span>
+                </div>
+
+                <div class="input-row">
+                    <label>Heating %:</label>
+                    <input type="range" id="inputHeatingPercent" min="0" max="100" value="65">
+                    <span class="range-value" id="heatingValue">65%</span>
+                </div>
+
+                <button class="btn" onclick="sendUpdate()">Send Update</button>
+                <button class="btn secondary" onclick="sendRandomUpdate()">Random</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Preset Scenarios</h3>
+                <div class="presets">
+                    <button class="btn" onclick="loadPreset('cold')">Cold Room</button>
+                    <button class="btn" onclick="loadPreset('heating')">Actively Heating</button>
+                    <button class="btn" onclick="loadPreset('target_reached')">Target Reached</button>
+                    <button class="btn" onclick="loadPreset('overshoot')">Overshoot</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Auto Simulation</h3>
+                <button class="btn" id="toggleSimulation" onclick="toggleSimulation()">Start Auto Simulation</button>
+                <button class="btn secondary" onclick="clearLog()">Clear Log</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Activity Log</h3>
+                <div class="log-area" id="logArea"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Dependencies -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/vuex@4.1.0/dist/vuex.global.prod.js"></script>
+    
+    <script>
+        // Debug what's available
+        console.log('Vue loaded:', !!window.Vue);
+        console.log('Vuex loaded:', !!window.Vuex);
+        console.log('vuex loaded:', !!window.vuex);
+        
+        // Ensure Vue and Vuex are available globally
+        if (!window.Vue) {
+            console.error('Vue not loaded!');
+        }
+        if (!window.Vuex && !window.vuex) {
+            console.error('Vuex not loaded!');
+        }
+        
+        // Ensure both Vuex and vuex are available for UMD compatibility
+        if (window.Vuex && !window.vuex) {
+            window.vuex = window.Vuex;
+        }
+        console.log('Vuex global available:', !!window.Vuex);
+        console.log('vuex global available:', !!window.vuex);
+    </script>
+    
+    <!-- Our Thermostat Widget UMD -->
+    <script src="./resources/ui-thermostat.umd.js"></script>
+
+    <script>
+        console.log('After UMD load:');
+        console.log('ui-thermostat global:', window['ui-thermostat']);
+        console.log('UIThermostat component:', window['ui-thermostat']?.UIThermostat);
+        
+        const { createApp } = Vue;
+        const { createStore } = window.Vuex;
+
+        // Mock Node-RED Dashboard data store
+        const store = createStore({
+            modules: {
+                data: {
+                    namespaced: true,
+                    state: {
+                        messages: {}
+                    },
+                    mutations: {
+                        updateMessage(state, { id, msg }) {
+                            state.messages = { ...state.messages, [id]: msg };
+                        }
+                    }
+                }
+            }
+        });
+
+        // Mock Node-RED socket and data tracker
+        const mockSocket = {
+            emit(event, id, msg) {
+                logMessage('output', `Socket emit: ${event} for ${id} with ${JSON.stringify(msg)}`);
+                
+                // Simulate receiving the message back (echo for testing)
+                setTimeout(() => {
+                    if (event === 'widget-action' && msg.payload && msg.payload.targetTemp !== undefined) {
+                        // Update the status indicator when target temp changes
+                        const statusIndicator = document.getElementById('statusIndicator');
+                        statusIndicator.classList.add('active');
+                        setTimeout(() => statusIndicator.classList.remove('active'), 1000);
+                    }
+                }, 100);
+            }
+        };
+
+        const mockDataTracker = (id, onInput, onLoad) => {
+            logMessage('system', `Data tracker initialized for widget: ${id}`);
+            // Store references for external updates
+            window.mockOnInput = onInput;
+            window.mockOnLoad = onLoad;
+        };
+
+        // Create Vue app
+        const app = createApp({
+            data() {
+                return {
+                    widgetId: 'thermostat-test-1',
+                    widgetProps: {},
+                    widgetState: { 
+                        enabled: true, 
+                        visible: true 
+                    }
+                };
+            },
+            mounted() {
+                logMessage('system', 'Vue app mounted with actual thermostat component');
+                
+                // Initial data load
+                setTimeout(() => {
+                    this.sendInitialData();
+                }, 500);
+            },
+            methods: {
+                sendInitialData() {
+                    const initialData = {
+                        currentTemp: 21.8,
+                        targetTemp: 22.5,
+                        heatingPercent: 65
+                    };
+                    updateWidgetData(initialData);
+                }
+            }
+        });
+
+        // Provide mocks
+        app.provide('$socket', mockSocket);
+        app.provide('$dataTracker', mockDataTracker);
+
+        // Use store
+        app.use(store);
+
+        // Register the thermostat component from UMD
+        const thermostatComponent = window['ui-thermostat']?.UIThermostat;
+        if (!thermostatComponent) {
+            console.error('UIThermostat component not found in UMD!');
+            console.log('Available in ui-thermostat global:', Object.keys(window['ui-thermostat'] || {}));
+            document.getElementById('app').innerHTML = '<div style="color: red; padding: 20px;">Error: UIThermostat component not loaded from UMD. Check browser console for details.</div>';
+        } else {
+            console.log('Registering UIThermostat component:', thermostatComponent);
+            app.component('ui-thermostat', thermostatComponent);
+            
+            // Mount the app
+            const vueApp = app.mount('#app');
+        }
+
+        // Debug panel state
+        let simulationInterval = null;
+
+        // Helper function to update widget data
+        function updateWidgetData(data) {
+            const msg = { payload: data };
+            store.commit('data/updateMessage', { id: 'thermostat-test-1', msg });
+            logMessage('input', `Widget data updated: ${JSON.stringify(data)}`);
+        }
+
+        // Debug panel functions
+        function sendUpdate() {
+            const data = {
+                currentTemp: parseFloat(document.getElementById('inputCurrentTemp').value),
+                targetTemp: parseFloat(document.getElementById('inputTargetTemp').value),
+                heatingPercent: parseInt(document.getElementById('inputHeatingPercent').value)
+            };
+            updateWidgetData(data);
+        }
+
+        function sendRandomUpdate() {
+            const data = {
+                currentTemp: 18 + Math.random() * 8, // 18-26°C
+                heatingPercent: Math.random() > 0.3 ? Math.floor(Math.random() * 100) : 0
+            };
+            updateWidgetData(data);
+        }
+
+        function loadPreset(preset) {
+            const presets = {
+                cold: { currentTemp: 18.5, targetTemp: 22.0, heatingPercent: 85 },
+                heating: { currentTemp: 20.8, targetTemp: 23.0, heatingPercent: 72 },
+                target_reached: { currentTemp: 22.4, targetTemp: 22.5, heatingPercent: 0 },
+                overshoot: { currentTemp: 23.2, targetTemp: 22.5, heatingPercent: 0 }
+            };
+            
+            if (presets[preset]) {
+                updateWidgetData(presets[preset]);
+                logMessage('input', `Loaded preset: ${preset}`);
+            }
+        }
+
+        function toggleSimulation() {
+            const button = document.getElementById('toggleSimulation');
+            
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+                button.textContent = 'Start Auto Simulation';
+                button.classList.remove('secondary');
+                logMessage('system', 'Auto simulation stopped');
+            } else {
+                simulationInterval = setInterval(() => {
+                    // Get current state from store
+                    const currentMsg = store.state.data.messages['thermostat-test-1'];
+                    let currentTemp = currentMsg?.payload?.currentTemp || 21.8;
+                    let targetTemp = currentMsg?.payload?.targetTemp || 22.5;
+                    let heatingPercent = currentMsg?.payload?.heatingPercent || 0;
+                    
+                    // Simulate realistic temperature changes
+                    const tempDiff = targetTemp - currentTemp;
+                    
+                    // Room temperature drift
+                    if (heatingPercent === 0) {
+                        currentTemp += (Math.random() - 0.7) * 0.1; // Slow cooling
+                    } else {
+                        currentTemp += (tempDiff * 0.1) + (Math.random() - 0.5) * 0.05; // Heating up
+                    }
+                    
+                    currentTemp = Math.max(10, Math.min(35, currentTemp)); // Clamp temperature
+                    
+                    // Update heating percentage based on temperature difference
+                    const newTempDiff = targetTemp - currentTemp;
+                    if (Math.abs(newTempDiff) < 0.2) {
+                        heatingPercent = 0;
+                    } else if (newTempDiff > 0.2) {
+                        heatingPercent = Math.min(100, Math.max(10, Math.round(newTempDiff * 50 + Math.random() * 20)));
+                    } else {
+                        heatingPercent = 0;
+                    }
+                    
+                    updateWidgetData({
+                        currentTemp,
+                        targetTemp,
+                        heatingPercent
+                    });
+                }, 2000);
+                
+                button.textContent = 'Stop Auto Simulation';
+                button.classList.add('secondary');
+                logMessage('system', 'Auto simulation started');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('logArea').innerHTML = '';
+        }
+
+        function logMessage(type, message) {
+            const logArea = document.getElementById('logArea');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (logArea.children.length > 50) {
+                logArea.removeChild(logArea.firstChild);
+            }
+        }
+
+        // Grid column control functions
+        function setGridColumns(columns) {
+            const groupElement = document.querySelector('.nrdb-ui-group');
+            groupElement.style.setProperty('--layout-columns', columns);
+            document.getElementById('inputGridColumns').value = columns;
+            document.getElementById('columnsValue').textContent = columns + ' cols';
+            logMessage('system', `Card width changed to ${columns} columns`);
+        }
+
+        // Widget rows control functions (simulates 2x2 fixed size)
+        function setWidgetRows(rows) {
+            const widgetElement = document.querySelector('.nrdb-ui-widget');
+            const rowsValue = document.getElementById('rowsValue');
+            
+            if (rows === 0) {
+                widgetElement.style.height = 'auto';
+                widgetElement.style.gridTemplateRows = '';
+                rowsValue.textContent = 'Auto';
+                logMessage('system', `Height constraint removed (auto)`);
+            } else {
+                const rowHeight = 24; // matches --widget-row-height
+                const totalHeight = rows * rowHeight;
+                widgetElement.style.height = totalHeight + 'px';
+                widgetElement.style.gridTemplateRows = `repeat(${rows}, ${rowHeight}px)`;
+                rowsValue.textContent = rows + ' rows (' + totalHeight + 'px)';
+                logMessage('system', `Height constrained to ${rows} rows (${totalHeight}px) - simulates ${rows}x2 widget`);
+            }
+            document.getElementById('inputWidgetRows').value = rows;
+        }
+
+        // Event listeners for debug controls
+        document.getElementById('inputGridColumns').addEventListener('input', function() {
+            const columns = this.value;
+            setGridColumns(columns);
+        });
+
+        document.getElementById('inputWidgetRows').addEventListener('input', function() {
+            setWidgetRows(parseInt(this.value));
+        });
+
+        document.getElementById('inputHeatingPercent').addEventListener('input', function() {
+            document.getElementById('heatingValue').textContent = this.value + '%';
+        });
+
+        // Initialize
+        setGridColumns(3);
+        logMessage('system', 'Vue Thermostat test bed initialized - loading actual Vue component');
+    </script>
+</body>
+</html>
