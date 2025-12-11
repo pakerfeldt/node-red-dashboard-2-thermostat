@@ -1,0 +1,174 @@
+[
+    {
+        "id": "thermostat-example",
+        "type": "subflow",
+        "name": "Thermostat Example",
+        "info": "Example flow showing how to use the thermostat widget with simulated data",
+        "category": "",
+        "in": [],
+        "out": [],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA00"
+    },
+    {
+        "id": "inject-temp-data",
+        "type": "inject",
+        "z": "thermostat-example",
+        "name": "Simulate Temperature Data",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "generate-temp-data"
+            ]
+        ]
+    },
+    {
+        "id": "generate-temp-data",
+        "type": "function",
+        "z": "thermostat-example",
+        "name": "Generate Thermostat Data",
+        "func": "// Simulate room temperature fluctuation\nconst baseTemp = 21.5;\nconst variation = (Math.random() - 0.5) * 2; // ±1°C\nconst currentTemp = baseTemp + variation;\n\n// Get target temp from context or default\nconst targetTemp = context.get('targetTemp') || 22.5;\n\n// Simulate heating percentage based on temperature difference\nconst tempDiff = targetTemp - currentTemp;\nlet heatingPercent = 0;\nif (tempDiff > 0.2) {\n    heatingPercent = Math.min(100, Math.round(tempDiff * 50 + Math.random() * 20));\n}\n\nmsg.payload = {\n    currentTemp: Math.round(currentTemp * 10) / 10,\n    targetTemp: targetTemp,\n    heatingPercent: heatingPercent\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 140,
+        "wires": [
+            [
+                "thermostat-widget"
+            ]
+        ]
+    },
+    {
+        "id": "thermostat-widget",
+        "type": "ui-thermostat",
+        "z": "thermostat-example",
+        "name": "Living Room Thermostat",
+        "group": "default-group",
+        "order": 1,
+        "width": 6,
+        "height": 6,
+        "minTemp": 15,
+        "maxTemp": 30,
+        "tempStep": 0.5,
+        "x": 680,
+        "y": 140,
+        "wires": [
+            [
+                "handle-user-adjustment"
+            ]
+        ]
+    },
+    {
+        "id": "handle-user-adjustment",
+        "type": "function",
+        "z": "thermostat-example",
+        "name": "Handle User Temperature Change",
+        "func": "// Check if this is a user adjustment\nif (msg.payload && msg.payload.source === 'user') {\n    // Store the new target temperature\n    context.set('targetTemp', msg.payload.targetTemp);\n    \n    // Log the change\n    node.log(`User set target temperature to ${msg.payload.targetTemp}°C`);\n    \n    // Here you would typically send to your heating controller\n    // For this example, we just pass through\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 140,
+        "wires": [
+            [
+                "debug-output"
+            ]
+        ]
+    },
+    {
+        "id": "debug-output",
+        "type": "debug",
+        "z": "thermostat-example",
+        "name": "Temperature Changes",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "default-group",
+        "type": "ui-group",
+        "name": "Thermostat Controls",
+        "page": "default-page",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "default-page",
+        "type": "ui-page",
+        "name": "Home Control",
+        "ui": "default-ui",
+        "path": "/home",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "default-theme",
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "default-ui",
+        "type": "ui-base",
+        "name": "Dashboard",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "showPageTitle": true,
+        "navigationStyle": "default",
+        "titleBarStyle": "default"
+    },
+    {
+        "id": "default-theme",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    }
+]

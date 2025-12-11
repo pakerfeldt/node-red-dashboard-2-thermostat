@@ -1,0 +1,1 @@
+export { default as UIThermostat } from './components/UIThermostat.vue'

@@ -1,0 +1,183 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ui-thermostat', {
+        category: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.label.category'),
+        color: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.colors.light'),
+        defaults: {
+            name: { value: "" },
+            group: { type: 'ui-group', required: true },
+            order: { value: 0 },
+            width: {
+                value: 0,
+                validate: function (v) {
+                    const width = v || 0
+                    const currentGroup = $('#node-input-group').val() || this.group
+                    const groupNode = RED.nodes.node(currentGroup)
+                    const valid = !groupNode || +width <= +groupNode.width
+                    $('#node-input-size').toggleClass('input-error', !valid)
+                    return valid
+                }
+            },
+            height: { value: 0 },
+            minTemp: { 
+                value: 15,
+                validate: function(v) {
+                    const num = parseFloat(v)
+                    return !isNaN(num) && num >= -50 && num <= 50 && num < (parseFloat($('#node-input-maxTemp').val()) || 30)
+                }
+            },
+            maxTemp: { 
+                value: 30,
+                validate: function(v) {
+                    const num = parseFloat(v)
+                    return !isNaN(num) && num >= -50 && num <= 50 && num > (parseFloat($('#node-input-minTemp').val()) || 15)
+                }
+            },
+            tempStep: {
+                value: 0.5,
+                validate: function(v) {
+                    const num = parseFloat(v)
+                    return !isNaN(num) && num > 0 && num <= 5
+                }
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        outputLabels: ["temperature control"],
+        icon: "ui-thermostat.svg",
+        paletteLabel: "thermostat",
+        label: function () {
+            return this.name || "thermostat"
+        },
+        oneditprepare: function () {
+            // Initialize base UI elements
+            $('#node-input-size').elementSizer({
+                width: '#node-input-width',
+                height: '#node-input-height',
+                group: '#node-input-group'
+            })
+
+            // Add validation feedback for temperature ranges
+            const validateTempRange = function() {
+                const minTemp = parseFloat($('#node-input-minTemp').val()) || 15
+                const maxTemp = parseFloat($('#node-input-maxTemp').val()) || 30
+                
+                if (minTemp >= maxTemp) {
+                    $('#temp-range-error').show()
+                } else {
+                    $('#temp-range-error').hide()
+                }
+            }
+
+            $('#node-input-minTemp, #node-input-maxTemp').on('input', validateTempRange)
+            
+            // Initial validation
+            validateTempRange()
+        }
+    })
+</script>
+
+<script type="text/html" data-template-name="ui-thermostat">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="ui-base.label.name">Name</span></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]ui-base.label.name">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-group"><i class="fa fa-table"></i> <span data-i18n="ui-base.label.group">Group</span></label>
+        <input type="text" id="node-input-group">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-size"><i class="fa fa-object-group"></i> <span data-i18n="ui-base.label.size">Size</span></label>
+        <input type="hidden" id="node-input-width">
+        <input type="hidden" id="node-input-height">
+        <button class="editor-button" id="node-input-size"></button>
+    </div>
+    
+    <hr>
+    
+    <div class="form-row">
+        <label for="node-input-minTemp"><i class="fa fa-thermometer-empty"></i> Min Temperature</label>
+        <input type="number" id="node-input-minTemp" step="0.5" min="-50" max="50" style="width: 80px;">
+        <span>°C</span>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-maxTemp"><i class="fa fa-thermometer-full"></i> Max Temperature</label>
+        <input type="number" id="node-input-maxTemp" step="0.5" min="-50" max="50" style="width: 80px;">
+        <span>°C</span>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-tempStep"><i class="fa fa-step-forward"></i> Temperature Step</label>
+        <input type="number" id="node-input-tempStep" step="0.1" min="0.1" max="5" style="width: 80px;">
+        <span>°C</span>
+    </div>
+    
+    <div id="temp-range-error" class="form-row" style="display: none;">
+        <div class="form-tips" style="color: red;">
+            <strong>Error:</strong> Minimum temperature must be less than maximum temperature.
+        </div>
+    </div>
+    
+    <hr>
+    
+    <div class="form-tips">
+        <p><strong>Data Format:</strong> Send messages with the following payload structure:</p>
+        <pre>{
+  "currentTemp": 21.8,     // Current room temperature
+  "targetTemp": 22.5,      // Target temperature (optional)
+  "heatingPercent": 65     // Heating actuator opening (0-100%)
+}</pre>
+        <p><strong>Output:</strong> Emits messages when user adjusts target temperature with source: "user"</p>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="ui-thermostat">
+    <p>A circular thermostat widget designed for floor heating systems with room sensors.</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>
+            <p>Object containing temperature data:</p>
+            <ul>
+                <li><code>currentTemp</code> (number): Current room temperature from sensor</li>
+                <li><code>targetTemp</code> (number): Target temperature setpoint (optional)</li>
+                <li><code>heatingPercent</code> (number): Heating actuator opening percentage (0-100)</li>
+            </ul>
+        </dd>
+    </dl>
+    
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>
+            <p>When user adjusts target temperature:</p>
+            <ul>
+                <li><code>targetTemp</code> (number): New target temperature</li>
+                <li><code>source</code> (string): Always "user" for manual adjustments</li>
+            </ul>
+        </dd>
+    </dl>
+    
+    <h3>Details</h3>
+    <p>This widget displays:</p>
+    <ul>
+        <li><strong>Current temperature</strong> from room sensor (top label)</li>
+        <li><strong>Target temperature</strong> prominently in center (user controllable)</li>
+        <li><strong>Heating status</strong> showing actuator percentage when > 0% (bottom)</li>
+        <li><strong>Visual indicator</strong> with graduated dial and pointer</li>
+    </ul>
+    
+    <p>Users can adjust the target temperature using the +/- buttons or keyboard arrows.</p>
+    
+    <h3>Configuration</h3>
+    <ul>
+        <li><strong>Min/Max Temperature:</strong> Sets the range for the dial and controls</li>
+        <li><strong>Temperature Step:</strong> Increment for +/- buttons (recommended: 0.5°C)</li>
+    </ul>
+    
+    <h3>Example Usage</h3>
+    <p>Connect to a floor heating controller that provides room temperature, current setpoint, and heating valve position.</p>
+</script>
