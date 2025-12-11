@@ -232,12 +232,14 @@ export default {
   --shadow-inset-dark: rgba(0, 0, 0, 0.4);
 /* ===================================================================== */
 
-  /* Component dimensions */
+  /* Component dimensions - responsive sizing */
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
   margin: 0 auto;
-  
+  container-type: size;
+
   /* Font family for the widget */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -248,9 +250,9 @@ export default {
   height: 100%;
   border-radius: 50%;
   background: linear-gradient(145deg, var(--dial-background-1), var(--dial-background-2));
-  box-shadow: 
-    0 8px 30px var(--shadow-primary),
-    inset 0 2px 4px var(--shadow-inset-light);
+  box-shadow:
+    0 2.86cqw 10.71cqw var(--shadow-primary),
+    inset 0 0.71cqw 1.43cqw var(--shadow-inset-light);
 }
 
 .dial-inner {
@@ -262,9 +264,9 @@ export default {
   height: 75%;
   border-radius: 50%;
   background: linear-gradient(165deg, var(--dial-inner-1) 0%, var(--dial-inner-2) 50%, var(--dial-inner-3) 100%);
-  box-shadow: 
-    inset 0 4px 12px var(--shadow-inset-dark),
-    inset 0 -2px 6px var(--shadow-inset-light);
+  box-shadow:
+    inset 0 1.43cqw 4.29cqw var(--shadow-inset-dark),
+    inset 0 -0.71cqw 2.14cqw var(--shadow-inset-light);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -283,29 +285,29 @@ export default {
 
 .tick {
   position: absolute;
-  top: 8px;
+  top: 2.86cqw;
   left: 50%;
-  width: 2px;
-  height: 10px;
+  width: 0.71cqw;
+  height: 3.57cqw;
   background: var(--tick-inactive);
-  border-radius: 1px;
-  transform-origin: 50% 132px;
+  border-radius: 0.36cqw;
+  transform-origin: 50% 47.14cqw;
 }
 
 .tick.active {
   background: var(--accent-primary);
-  box-shadow: 0 0 4px var(--accent-glow);
+  box-shadow: 0 0 1.43cqw var(--accent-glow);
 }
 
 /* Arrow indicator */
 .indicator {
   position: absolute;
-  top: 8px;
+  top: 2.86cqw;
   left: 50%;
-  width: 2px;
-  height: 10px;
+  width: 0.71cqw;
+  height: 3.57cqw;
   background: transparent;
-  transform-origin: 50% 132px;
+  transform-origin: 50% 47.14cqw;
   z-index: 15;
   transition: transform 0.3s ease;
 }
@@ -313,15 +315,15 @@ export default {
 .indicator::after {
   content: '';
   position: absolute;
-  top: -6px;
+  top: -2.14cqw;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 10px solid var(--accent-primary);
-  filter: drop-shadow(0 0 4px var(--accent-glow));
+  border-left: 2.14cqw solid transparent;
+  border-right: 2.14cqw solid transparent;
+  border-top: 3.57cqw solid var(--accent-primary);
+  filter: drop-shadow(0 0 1.43cqw var(--accent-glow));
 }
 
 /* Center content */
@@ -332,70 +334,70 @@ export default {
 }
 
 .dial-label {
-  font-size: 13px;
+  font-size: 4.64cqw;
   color: var(--text-secondary);
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
+  margin-bottom: 1.43cqw;
+  letter-spacing: 0.18cqw;
 }
 
 .dial-temperature {
-  font-size: 52px;
+  font-size: 18.57cqw;
   font-weight: 300;
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 1.43cqw;
   color: var(--text-primary);
 }
 
 .dial-temperature .degree {
-  font-size: 28px;
+  font-size: 10cqw;
   vertical-align: super;
 }
 
 .dial-status {
-  font-size: 12px;
+  font-size: 4.29cqw;
   color: var(--text-muted);
-  min-height: 14px; /* Prevents layout shift when empty */
+  min-height: 5cqw; /* Prevents layout shift when empty */
 }
 
 /* Min/Max labels */
 .range-label {
   position: absolute;
-  font-size: 13px;
+  font-size: 4.64cqw;
   color: var(--range-labels);
 }
 
 .range-label.min {
-  bottom: 28px;
-  left: 65px;
+  bottom: 10cqw;
+  left: 23.21cqw;
 }
 
 .range-label.max {
-  bottom: 28px;
-  right: 65px;
+  bottom: 10cqw;
+  right: 23.21cqw;
 }
 
 /* Control buttons */
 .controls {
   position: absolute;
-  bottom: 30px;
+  bottom: 10.71cqw;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 20px;
+  gap: 7.14cqw;
   z-index: 20;
 }
 
 .btn {
-  width: 40px;
-  height: 40px;
+  width: 14.29cqw;
+  height: 14.29cqw;
   border-radius: 50%;
   border: none;
   background: linear-gradient(145deg, var(--button-background-1), var(--button-background-2));
-  box-shadow: 
-    0 3px 8px var(--shadow-primary),
-    inset 0 1px 2px var(--shadow-inset-light);
+  box-shadow:
+    0 1.07cqw 2.86cqw var(--shadow-primary),
+    inset 0 0.36cqw 0.71cqw var(--shadow-inset-light);
   color: var(--button-text);
-  font-size: 24px;
+  font-size: 8.57cqw;
   font-weight: 300;
   cursor: pointer;
   display: flex;
@@ -412,9 +414,9 @@ export default {
 
 .btn:active:not(:disabled) {
   transform: scale(0.95);
-  box-shadow: 
-    0 2px 4px var(--shadow-primary),
-    inset 0 1px 2px var(--shadow-inset-light);
+  box-shadow:
+    0 0.71cqw 1.43cqw var(--shadow-primary),
+    inset 0 0.36cqw 0.71cqw var(--shadow-inset-light);
 }
 
 .btn:disabled {
@@ -424,6 +426,6 @@ export default {
 
 .btn span {
   line-height: 1;
-  margin-top: -2px;
+  margin-top: -0.71cqw;
 }
 </style>
