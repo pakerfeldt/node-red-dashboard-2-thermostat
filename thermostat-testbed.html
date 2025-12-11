@@ -243,7 +243,6 @@
         .thermostat {
             position: relative;
             width: 100%;
-            max-width: 280px;
             aspect-ratio: 1;
             container-type: size;
         }
@@ -804,6 +803,10 @@
         // Initialize
         generateTicks();
         updateDisplay();
+
+        // Set initial widget size to match the slider default
+        setWidgetSize(280);
+
         logMessage('system', 'Thermostat test bed initialized');
 
         // Start with a small simulation to show activity

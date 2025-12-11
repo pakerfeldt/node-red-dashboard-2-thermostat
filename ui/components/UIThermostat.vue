@@ -235,9 +235,7 @@ export default {
   /* Component dimensions - responsive sizing */
   position: relative;
   width: 100%;
-  max-width: 280px;
   aspect-ratio: 1;
-  margin: 0 auto;
   container-type: size;
 
   /* Font family for the widget */
