@@ -235,6 +235,7 @@ export default {
   /* Component dimensions - responsive sizing */
   position: relative;
   width: 100%;
+  height: 100%;
   aspect-ratio: 1;
   container-type: size;
 

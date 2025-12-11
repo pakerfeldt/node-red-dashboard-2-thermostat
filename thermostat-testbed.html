@@ -276,6 +276,7 @@
         .thermostat {
             position: relative;
             width: 100%;
+            height: 100%;
             aspect-ratio: 1;
             container-type: size;
         }
@@ -542,6 +543,23 @@
             </div>
 
             <div class="control-group">
+                <h3>Test Height Constraint (2x2 Widget)</h3>
+
+                <div class="input-row">
+                    <label>Widget Rows:</label>
+                    <input type="range" id="inputWidgetRows" min="0" max="10" value="0" step="1">
+                    <span class="range-value" id="rowsValue">Auto</span>
+                </div>
+
+                <div class="presets" style="margin-top: 10px;">
+                    <button class="btn" onclick="setWidgetRows(0)">Auto (no limit)</button>
+                    <button class="btn" onclick="setWidgetRows(2)">2 Rows (48px)</button>
+                    <button class="btn" onclick="setWidgetRows(4)">4 Rows (96px)</button>
+                    <button class="btn" onclick="setWidgetRows(8)">8 Rows (192px)</button>
+                </div>
+            </div>
+
+            <div class="control-group">
                 <h3>Input Data</h3>
 
                 <div class="input-row">
@@ -624,7 +642,10 @@
         const heatingValue = document.getElementById('heatingValue');
         const inputGridColumns = document.getElementById('inputGridColumns');
         const columnsValue = document.getElementById('columnsValue');
+        const inputWidgetRows = document.getElementById('inputWidgetRows');
+        const rowsValue = document.getElementById('rowsValue');
         const groupElement = document.querySelector('.nrdb-ui-group');
+        const widgetElement = document.querySelector('.nrdb-ui-widget');
 
         // Simulation state
         let simulationInterval = null;
@@ -828,6 +849,29 @@
             const columns = this.value;
             groupElement.style.setProperty('--layout-columns', columns);
             columnsValue.textContent = columns + ' cols';
+        });
+
+        // Widget rows control functions (simulates 2x2 fixed size)
+        function setWidgetRows(rows) {
+            if (rows === 0) {
+                widgetElement.style.height = 'auto';
+                widgetElement.style.gridTemplateRows = '';
+                rowsValue.textContent = 'Auto';
+                logMessage('system', `Height constraint removed (auto)`);
+            } else {
+                const rowHeight = 24; // matches --widget-row-height
+                const totalHeight = rows * rowHeight;
+                widgetElement.style.height = totalHeight + 'px';
+                widgetElement.style.gridTemplateRows = `repeat(${rows}, ${rowHeight}px)`;
+                rowsValue.textContent = rows + ' rows (' + totalHeight + 'px)';
+                logMessage('system', `Height constrained to ${rows} rows (${totalHeight}px) - simulates ${rows}x2 widget`);
+            }
+            inputWidgetRows.value = rows;
+        }
+
+        // Update rows value display when slider changes
+        inputWidgetRows.addEventListener('input', function() {
+            setWidgetRows(parseInt(this.value));
         });
 
         // Update heating value display when slider changes
