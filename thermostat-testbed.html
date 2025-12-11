@@ -82,15 +82,48 @@
             gap: 40px;
         }
 
-        .widget-area {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--widget-area-bg);
+        /* Mimic Node-RED Dashboard v-card structure */
+        .nrdb-ui-group {
+            --layout-columns: 3;
+            --widget-gap: 12px;
+            --widget-row-height: 24px;
+        }
+
+        .v-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
             border-radius: 12px;
-            padding: 40px;
-            min-height: 400px;
-            border: 1px solid var(--panel-border);
+            overflow: hidden;
+        }
+
+        .v-card-item {
+            padding: 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .v-card-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .v-card-text {
+            padding: 16px;
+        }
+
+        .nrdb-layout-group--grid {
+            display: grid;
+            grid-template-columns: repeat(min(3, var(--layout-columns)), 1fr);
+            gap: var(--widget-gap);
+        }
+
+        .nrdb-ui-widget {
+            display: grid;
+            grid-template-columns: minmax(0px, 1fr);
+            gap: var(--widget-gap);
+            grid-template-rows: repeat(0, var(--widget-row-height));
+            grid-column-end: span min(3, var(--layout-columns));
         }
 
         .debug-panel {
@@ -437,38 +470,52 @@
 </head>
 <body>
     <div class="container">
-        <div class="widget-area">
-            <div class="thermostat">
-                <div class="dial">
-                    <!-- Tick marks -->
-                    <div class="ticks" id="ticks"></div>
-                    
-                    <!-- Arrow indicator -->
-                    <div class="indicator" id="indicator"></div>
-
-                    <!-- Inner dial with content -->
-                    <div class="dial-inner">
-                        <div class="dial-content">
-                            <div class="dial-label" id="dialLabel">Current 21.8°</div>
-                            <div class="dial-temperature">
-                                <span id="tempValue">22.5</span><span class="degree">°</span>
-                            </div>
-                            <div class="dial-status" id="dialStatus">Heating 65%</div>
-                        </div>
+        <!-- Mimic Node-RED Dashboard "Sovrum 1" group structure -->
+        <div class="nrdb-ui-group">
+            <div class="v-card">
+                <div class="v-card-item">
+                    <div class="v-card-item__content">
+                        <div class="v-card-title">Sovrum 1</div>
                     </div>
+                </div>
+                <div class="v-card-text">
+                    <div class="nrdb-layout-group--grid">
+                        <div class="nrdb-ui-widget nrdb-ui-thermostat">
+                            <div class="thermostat">
+                                <div class="dial">
+                                    <!-- Tick marks -->
+                                    <div class="ticks" id="ticks"></div>
 
-                    <!-- Min/Max labels -->
-                    <span class="range-label min" id="minLabel">15°</span>
-                    <span class="range-label max" id="maxLabel">30°</span>
+                                    <!-- Arrow indicator -->
+                                    <div class="indicator" id="indicator"></div>
 
-                    <!-- Control buttons -->
-                    <div class="controls">
-                        <button class="btn" id="btnMinus" aria-label="Decrease temperature">
-                            <span>−</span>
-                        </button>
-                        <button class="btn" id="btnPlus" aria-label="Increase temperature">
-                            <span>+</span>
-                        </button>
+                                    <!-- Inner dial with content -->
+                                    <div class="dial-inner">
+                                        <div class="dial-content">
+                                            <div class="dial-label" id="dialLabel">Current 21.8°</div>
+                                            <div class="dial-temperature">
+                                                <span id="tempValue">22.5</span><span class="degree">°</span>
+                                            </div>
+                                            <div class="dial-status" id="dialStatus">Heating 65%</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Min/Max labels -->
+                                    <span class="range-label min" id="minLabel">15°</span>
+                                    <span class="range-label max" id="maxLabel">30°</span>
+
+                                    <!-- Control buttons -->
+                                    <div class="controls">
+                                        <button class="btn" id="btnMinus" aria-label="Decrease temperature">
+                                            <span>−</span>
+                                        </button>
+                                        <button class="btn" id="btnPlus" aria-label="Increase temperature">
+                                            <span>+</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -478,18 +525,19 @@
             <h2><span class="status-indicator" id="statusIndicator"></span>Thermostat Test Bed</h2>
             
             <div class="control-group">
-                <h3>Widget Size</h3>
+                <h3>Card Width (Grid Columns)</h3>
 
                 <div class="input-row">
-                    <label>Size:</label>
-                    <input type="range" id="inputWidgetSize" min="140" max="280" value="280" step="10">
-                    <span class="range-value" id="sizeValue">280px</span>
+                    <label>Columns:</label>
+                    <input type="range" id="inputGridColumns" min="1" max="6" value="3" step="1">
+                    <span class="range-value" id="columnsValue">3 cols</span>
                 </div>
 
                 <div class="presets" style="margin-top: 10px;">
-                    <button class="btn" onclick="setWidgetSize(140)">50% (140px)</button>
-                    <button class="btn" onclick="setWidgetSize(210)">75% (210px)</button>
-                    <button class="btn" onclick="setWidgetSize(280)">100% (280px)</button>
+                    <button class="btn" onclick="setGridColumns(1)">1 Column (narrow)</button>
+                    <button class="btn" onclick="setGridColumns(2)">2 Columns</button>
+                    <button class="btn" onclick="setGridColumns(3)">3 Columns (default)</button>
+                    <button class="btn" onclick="setGridColumns(4)">4 Columns</button>
                 </div>
             </div>
 
@@ -574,9 +622,9 @@
         const inputTargetTemp = document.getElementById('inputTargetTemp');
         const inputHeatingPercent = document.getElementById('inputHeatingPercent');
         const heatingValue = document.getElementById('heatingValue');
-        const inputWidgetSize = document.getElementById('inputWidgetSize');
-        const sizeValue = document.getElementById('sizeValue');
-        const thermostatElement = document.querySelector('.thermostat');
+        const inputGridColumns = document.getElementById('inputGridColumns');
+        const columnsValue = document.getElementById('columnsValue');
+        const groupElement = document.querySelector('.nrdb-ui-group');
 
         // Simulation state
         let simulationInterval = null;
@@ -767,19 +815,19 @@
             }
         }
 
-        // Widget size control functions
-        function setWidgetSize(size) {
-            thermostatElement.style.maxWidth = size + 'px';
-            inputWidgetSize.value = size;
-            sizeValue.textContent = size + 'px';
-            logMessage('system', `Widget size changed to ${size}px (${Math.round(size/2.8)}%)`);
+        // Grid column control functions
+        function setGridColumns(columns) {
+            groupElement.style.setProperty('--layout-columns', columns);
+            inputGridColumns.value = columns;
+            columnsValue.textContent = columns + ' cols';
+            logMessage('system', `Card width changed to ${columns} columns`);
         }
 
-        // Update size value display when slider changes
-        inputWidgetSize.addEventListener('input', function() {
-            const size = this.value;
-            thermostatElement.style.maxWidth = size + 'px';
-            sizeValue.textContent = size + 'px';
+        // Update columns value display when slider changes
+        inputGridColumns.addEventListener('input', function() {
+            const columns = this.value;
+            groupElement.style.setProperty('--layout-columns', columns);
+            columnsValue.textContent = columns + ' cols';
         });
 
         // Update heating value display when slider changes
@@ -804,10 +852,10 @@
         generateTicks();
         updateDisplay();
 
-        // Set initial widget size to match the slider default
-        setWidgetSize(280);
+        // Set initial grid columns to match the slider default
+        setGridColumns(3);
 
-        logMessage('system', 'Thermostat test bed initialized');
+        logMessage('system', 'Thermostat test bed initialized - mimicking Node-RED Dashboard structure');
 
         // Start with a small simulation to show activity
         setTimeout(() => {
