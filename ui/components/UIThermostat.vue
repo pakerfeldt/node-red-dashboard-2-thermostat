@@ -235,27 +235,21 @@ export default {
   /* Component dimensions - ROBUST SQUARE CONTAINER STRATEGY */
   position: relative;
   
-  /* Force square aspect ratio regardless of parent constraints */
+  /* Square sizing: height-driven (works with Dashboard row constraints) */
   aspect-ratio: 1 / 1;
-  
-  /* Strategy: Use the smaller dimension to maintain square shape */
-  width: min(100%, 100cqh);
-  height: min(100%, 100cqw);
+
+  height: 100%;
+  width: auto;
+
   max-width: 100%;
   max-height: 100%;
-  
-  /* Fallback for environments where container queries don't work */
-  width: 100%;
-  height: 100%;
-  
-  /* Center the square container within its parent */
+
   margin: 0 auto;
-  
-  /* Minimum usable size - prevents unusable tiny widgets */
-  min-width: 100px;
-  min-height: 100px;
-  
-  /* Container queries with size containment */
+
+  /* Optional: if you *must* allow 2-row (48px) widgets, drop these */
+
+  /* min-width: 100px; */
+  /* min-height: 100px; */  /* Container queries with size containment */
   container-type: size;
   contain: size layout style;
 
@@ -481,20 +475,4 @@ export default {
   }
 }
 
-/* Ensure aspect ratio is maintained even in extreme constraints */
-@container (aspect-ratio < 0.8) {
-  .thermostat {
-    /* Force container to be square by setting explicit dimensions */
-    width: min(100%, 100cqh) !important;
-    height: min(100%, 100cqh) !important;
-  }
-}
-
-@container (aspect-ratio > 1.2) {
-  .thermostat {
-    /* Force container to be square by setting explicit dimensions */
-    width: min(100%, 100cqw) !important;
-    height: min(100%, 100cqw) !important;
-  }
-}
 </style>
