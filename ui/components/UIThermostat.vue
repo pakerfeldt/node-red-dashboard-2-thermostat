@@ -1,4 +1,5 @@
 <template>
+  <div class="thermostat-wrap">
   <div class="thermostat">
     <div class="dial">
       <!-- Tick marks -->
@@ -53,6 +54,7 @@
         </button>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -195,6 +197,19 @@ export default {
 </script>
 
 <style scoped>
+
+.thermostat-wrap {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* This makes container queries use this box */
+  container-type: size;
+}
+
 /* ==================== COLOR THEME CONFIGURATION ==================== */
 /* Note: CSS variables must be on the component root, not :root, for scoped styles */
 .thermostat {
@@ -233,11 +248,11 @@ export default {
 /* ===================================================================== */
 
   /* Component dimensions - ROBUST SQUARE CONTAINER STRATEGY */
+
   position: relative;
-  
-  /* Square sizing: height-driven (works with Dashboard row constraints) */
   aspect-ratio: 1 / 1;
 
+  /* Default: height is limiting (wide + short widgets) */
   height: 100%;
   width: auto;
 
@@ -246,15 +261,22 @@ export default {
 
   margin: 0 auto;
 
-  /* Optional: if you *must* allow 2-row (48px) widgets, drop these */
-
-  /* min-width: 100px; */
-  /* min-height: 100px; */  /* Container queries with size containment */
+  /* Keep if you want your cqmin-based internals */
   container-type: size;
   contain: size layout style;
 
+  position: relative;
+
   /* Font family for the widget */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@container (width < height) {
+  .thermostat {
+    /* When container is tall+narrow, width is limiting */
+    width: 100%;
+    height: auto;
+  }
 }
 
 .dial {
