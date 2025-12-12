@@ -1,5 +1,5 @@
 <template>
-  <div class="thermostat-wrap">
+  <div ref="wrapEl" class="thermostat-wrap">
   <div class="thermostat">
     <div class="dial">
       <!-- Tick marks -->
@@ -69,6 +69,10 @@ export default {
     props: { type: Object, default: () => ({}) },
     state: { type: Object, default: () => ({ enabled: false, visible: false }) }
   },
+  beforeUnmount() {
+    if (this._ro) this._ro.disconnect()
+    window.removeEventListener('resize', this.updateThermostatSize)
+  },
   data() {
     return {
       // Configuration
@@ -85,7 +89,8 @@ export default {
       
       // Computed values
       ticks: [],
-      totalTicks: 30
+      totalTicks: 30,
+      _ro: null
     }
   },
   computed: {
@@ -130,6 +135,12 @@ export default {
     
     // Set up data tracking
     this.$dataTracker(this.id, this.onInput, this.onLoad)
+
+    // Safari-safe sizing: explicitly set square size = min(width, height)
+    this.updateThermostatSize()
+    this._ro = new ResizeObserver(() => this.updateThermostatSize())
+    this._ro.observe(this.$refs.wrapEl)
+    window.addEventListener('resize', this.updateThermostatSize, { passive: true })
   },
   methods: {
     generateTicks() {
@@ -191,6 +202,15 @@ export default {
       if (msg && msg.payload) {
         this.updateFromPayload(msg.payload)
       }
+    },
+    updateThermostatSize() {
+      const el = this.$refs.wrapEl
+      if (!el) return
+
+      const r = el.getBoundingClientRect()
+      const size = Math.floor(Math.min(r.width, r.height))
+
+      el.style.setProperty('--thermo-size', `${size}px`)
     }
   }
 }
@@ -207,7 +227,7 @@ export default {
   justify-content: center;
 
   /* This makes container queries use this box */
-  container-type: size;
+  /* container-type: size; */
 }
 
 /* ==================== COLOR THEME CONFIGURATION ==================== */
@@ -248,11 +268,19 @@ export default {
 /* ===================================================================== */
 
   /* Component dimensions - ROBUST SQUARE CONTAINER STRATEGY */
+  /* Safari-safe square sizing */
+  width: var(--thermo-size, 100%);
+  height: var(--thermo-size, 100%);
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+  container-type: size;
+  contain: size layout style;
 
+/*
   position: relative;
   aspect-ratio: 1 / 1;
 
-  /* Default: height is limiting (wide + short widgets) */
   height: 100%;
   width: auto;
 
@@ -261,22 +289,13 @@ export default {
 
   margin: 0 auto;
 
-  /* Keep if you want your cqmin-based internals */
   container-type: size;
   contain: size layout style;
 
   position: relative;
-
+*/
   /* Font family for the widget */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-@container (width < height) {
-  .thermostat {
-    /* When container is tall+narrow, width is limiting */
-    width: 100%;
-    height: auto;
-  }
 }
 
 .dial {
