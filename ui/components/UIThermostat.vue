@@ -232,12 +232,32 @@ export default {
   --shadow-inset-dark: rgba(0, 0, 0, 0.4);
 /* ===================================================================== */
 
-  /* Component dimensions - responsive sizing */
+  /* Component dimensions - ROBUST SQUARE CONTAINER STRATEGY */
   position: relative;
+  
+  /* Force square aspect ratio regardless of parent constraints */
+  aspect-ratio: 1 / 1;
+  
+  /* Strategy: Use the smaller dimension to maintain square shape */
+  width: min(100%, 100cqh);
+  height: min(100%, 100cqw);
+  max-width: 100%;
+  max-height: 100%;
+  
+  /* Fallback for environments where container queries don't work */
   width: 100%;
   height: 100%;
-  aspect-ratio: 1;
+  
+  /* Center the square container within its parent */
+  margin: 0 auto;
+  
+  /* Minimum usable size - prevents unusable tiny widgets */
+  min-width: 100px;
+  min-height: 100px;
+  
+  /* Container queries with size containment */
   container-type: size;
+  contain: size layout style;
 
   /* Font family for the widget */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -250,8 +270,8 @@ export default {
   border-radius: 50%;
   background: linear-gradient(145deg, var(--dial-background-1), var(--dial-background-2));
   box-shadow:
-    0 2.86cqw 10.71cqw var(--shadow-primary),
-    inset 0 0.71cqw 1.43cqw var(--shadow-inset-light);
+    0 2.86cqmin 10.71cqmin var(--shadow-primary),
+    inset 0 0.71cqmin 1.43cqmin var(--shadow-inset-light);
 }
 
 .dial-inner {
@@ -264,8 +284,8 @@ export default {
   border-radius: 50%;
   background: linear-gradient(165deg, var(--dial-inner-1) 0%, var(--dial-inner-2) 50%, var(--dial-inner-3) 100%);
   box-shadow:
-    inset 0 1.43cqw 4.29cqw var(--shadow-inset-dark),
-    inset 0 -0.71cqw 2.14cqw var(--shadow-inset-light);
+    inset 0 1.43cqmin 4.29cqmin var(--shadow-inset-dark),
+    inset 0 -0.71cqmin 2.14cqmin var(--shadow-inset-light);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,29 +304,29 @@ export default {
 
 .tick {
   position: absolute;
-  top: 2.86cqw;
+  top: 2.86cqmin;
   left: 50%;
-  width: 0.71cqw;
-  height: 3.57cqw;
+  width: 0.71cqmin;
+  height: 3.57cqmin;
   background: var(--tick-inactive);
-  border-radius: 0.36cqw;
-  transform-origin: 50% 47.14cqw;
+  border-radius: 0.36cqmin;
+  transform-origin: 50% 47.14cqmin;
 }
 
 .tick.active {
   background: var(--accent-primary);
-  box-shadow: 0 0 1.43cqw var(--accent-glow);
+  box-shadow: 0 0 1.43cqmin var(--accent-glow);
 }
 
 /* Arrow indicator */
 .indicator {
   position: absolute;
-  top: 2.86cqw;
+  top: 2.86cqmin;
   left: 50%;
-  width: 0.71cqw;
-  height: 3.57cqw;
+  width: 0.71cqmin;
+  height: 3.57cqmin;
   background: transparent;
-  transform-origin: 50% 47.14cqw;
+  transform-origin: 50% 47.14cqmin;
   z-index: 15;
   transition: transform 0.3s ease;
 }
@@ -314,15 +334,15 @@ export default {
 .indicator::after {
   content: '';
   position: absolute;
-  top: -2.14cqw;
+  top: -2.14cqmin;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 2.14cqw solid transparent;
-  border-right: 2.14cqw solid transparent;
-  border-top: 3.57cqw solid var(--accent-primary);
-  filter: drop-shadow(0 0 1.43cqw var(--accent-glow));
+  border-left: 2.14cqmin solid transparent;
+  border-right: 2.14cqmin solid transparent;
+  border-top: 3.57cqmin solid var(--accent-primary);
+  filter: drop-shadow(0 0 1.43cqmin var(--accent-glow));
 }
 
 /* Center content */
@@ -333,70 +353,70 @@ export default {
 }
 
 .dial-label {
-  font-size: 4.64cqw;
+  font-size: 4.64cqmin;
   color: var(--text-secondary);
-  margin-bottom: 1.43cqw;
-  letter-spacing: 0.18cqw;
+  margin-bottom: 1.43cqmin;
+  letter-spacing: 0.18cqmin;
 }
 
 .dial-temperature {
-  font-size: 18.57cqw;
+  font-size: 18.57cqmin;
   font-weight: 300;
   line-height: 1;
-  margin-bottom: 1.43cqw;
+  margin-bottom: 1.43cqmin;
   color: var(--text-primary);
 }
 
 .dial-temperature .degree {
-  font-size: 10cqw;
+  font-size: 10cqmin;
   vertical-align: super;
 }
 
 .dial-status {
-  font-size: 4.29cqw;
+  font-size: 4.29cqmin;
   color: var(--text-muted);
-  min-height: 5cqw; /* Prevents layout shift when empty */
+  min-height: 5cqmin; /* Prevents layout shift when empty */
 }
 
 /* Min/Max labels */
 .range-label {
   position: absolute;
-  font-size: 4.64cqw;
+  font-size: 4.64cqmin;
   color: var(--range-labels);
 }
 
 .range-label.min {
-  bottom: 10cqw;
-  left: 23.21cqw;
+  bottom: 10cqmin;
+  left: 23.21cqmin;
 }
 
 .range-label.max {
-  bottom: 10cqw;
-  right: 23.21cqw;
+  bottom: 10cqmin;
+  right: 23.21cqmin;
 }
 
 /* Control buttons */
 .controls {
   position: absolute;
-  bottom: 10.71cqw;
+  bottom: 10.71cqmin;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 7.14cqw;
+  gap: 7.14cqmin;
   z-index: 20;
 }
 
 .btn {
-  width: 14.29cqw;
-  height: 14.29cqw;
+  width: 14.29cqmin;
+  height: 14.29cqmin;
   border-radius: 50%;
   border: none;
   background: linear-gradient(145deg, var(--button-background-1), var(--button-background-2));
   box-shadow:
-    0 1.07cqw 2.86cqw var(--shadow-primary),
-    inset 0 0.36cqw 0.71cqw var(--shadow-inset-light);
+    0 1.07cqmin 2.86cqmin var(--shadow-primary),
+    inset 0 0.36cqmin 0.71cqmin var(--shadow-inset-light);
   color: var(--button-text);
-  font-size: 8.57cqw;
+  font-size: 8.57cqmin;
   font-weight: 300;
   cursor: pointer;
   display: flex;
@@ -414,8 +434,8 @@ export default {
 .btn:active:not(:disabled) {
   transform: scale(0.95);
   box-shadow:
-    0 0.71cqw 1.43cqw var(--shadow-primary),
-    inset 0 0.36cqw 0.71cqw var(--shadow-inset-light);
+    0 0.71cqmin 1.43cqmin var(--shadow-primary),
+    inset 0 0.36cqmin 0.71cqmin var(--shadow-inset-light);
 }
 
 .btn:disabled {
@@ -425,6 +445,56 @@ export default {
 
 .btn span {
   line-height: 1;
-  margin-top: -0.71cqw;
+  margin-top: -0.71cqmin;
+}
+
+/* Container query-based responsive behavior */
+/* Hide non-essential elements when container is very small */
+@container (max-width: 150px) {
+  .range-label {
+    display: none; /* Hide min/max labels when too small */
+  }
+  
+  .dial-status {
+    display: none; /* Hide heating status when too small */
+  }
+  
+  .tick {
+    opacity: 0.5; /* Make tick marks more subtle */
+  }
+}
+
+/* Simplified layout for extremely small containers */
+@container (max-width: 100px) {
+  .ticks {
+    display: none; /* Hide all tick marks */
+  }
+  
+  .controls {
+    gap: 3cqmin; /* Reduce button spacing */
+  }
+  
+  .btn {
+    width: 12cqmin; /* Smaller buttons */
+    height: 12cqmin;
+    font-size: 7cqmin;
+  }
+}
+
+/* Ensure aspect ratio is maintained even in extreme constraints */
+@container (aspect-ratio < 0.8) {
+  .thermostat {
+    /* Force container to be square by setting explicit dimensions */
+    width: min(100%, 100cqh) !important;
+    height: min(100%, 100cqh) !important;
+  }
+}
+
+@container (aspect-ratio > 1.2) {
+  .thermostat {
+    /* Force container to be square by setting explicit dimensions */
+    width: min(100%, 100cqw) !important;
+    height: min(100%, 100cqw) !important;
+  }
 }
 </style>

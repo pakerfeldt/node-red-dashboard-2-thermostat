@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container Query Test - Aspect Ratio Violations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        
+        .test-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        /* Test Case 1: Normal container with aspect-ratio */
+        .test1 {
+            width: 300px;
+            aspect-ratio: 1;
+            container-type: size;
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            border: 2px solid #2196f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Test Case 2: Width and height independently constrained */
+        .test2 {
+            width: 300px;
+            height: 150px; /* Violates 1:1 aspect-ratio */
+            aspect-ratio: 1;
+            container-type: size;
+            background: linear-gradient(45deg, #fff3e0, #ffcc02);
+            border: 2px solid #ff9800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Test Case 3: Height constraint with aspect-ratio */
+        .test3 {
+            height: 200px;
+            aspect-ratio: 1;
+            container-type: size;
+            background: linear-gradient(45deg, #f3e5f5, #e1bee7);
+            border: 2px solid #9c27b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Test Case 4: Max constraints overriding aspect-ratio */
+        .test4 {
+            width: 300px;
+            height: 300px;
+            max-width: 400px;
+            max-height: 150px; /* This should override the height */
+            aspect-ratio: 1;
+            container-type: size;
+            background: linear-gradient(45deg, #e8f5e8, #c8e6c9);
+            border: 2px solid #4caf50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Content inside containers */
+        .content {
+            font-size: 2cqw;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+            padding: 1cqw;
+            background: rgba(255,255,255,0.8);
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+        
+        .dimensions {
+            position: absolute;
+            top: 0.5cqw;
+            left: 0.5cqw;
+            font-size: 1.2cqw;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.3cqw 0.6cqw;
+            border-radius: 2px;
+            font-family: monospace;
+        }
+        
+        /* Container query tests */
+        @container (width >= 280px) {
+            .content { 
+                background: rgba(0,255,0,0.3);
+            }
+            .content::before {
+                content: "Width ≥ 280px ✓";
+                display: block;
+                font-size: 1.5cqw;
+                color: green;
+            }
+        }
+        
+        @container (height >= 280px) {
+            .content::after {
+                content: " Height ≥ 280px ✓";
+                display: block;
+                font-size: 1.5cqw;
+                color: blue;
+            }
+        }
+        
+        @container (aspect-ratio >= 1) {
+            .content {
+                border-color: purple;
+                border-width: 2px;
+            }
+        }
+        
+        @container (aspect-ratio < 1) {
+            .content {
+                border-color: red;
+                border-width: 3px;
+                background: rgba(255,0,0,0.2);
+            }
+        }
+        
+        /* Different container query unit tests */
+        .cq-units {
+            margin-top: 1cqw;
+            padding: 1cqh;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid #ccc;
+            font-size: 1.5cqmin;
+        }
+        
+        .info {
+            background: #f5f5f5;
+            padding: 10px;
+            border-left: 4px solid #2196f3;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .debug {
+            position: absolute;
+            bottom: 0.5cqw;
+            right: 0.5cqw;
+            font-size: 1cqw;
+            background: rgba(255,255,255,0.9);
+            padding: 0.3cqw;
+            border-radius: 2px;
+            font-family: monospace;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Container Query Behavior Test</h1>
+    <p>Testing how container queries behave when aspect-ratio conflicts with explicit width/height constraints.</p>
+    
+    <div class="test-container">
+        <h3>Test 1: Normal - Width + aspect-ratio: 1</h3>
+        <div class="info">Expected: 300×300px square, container queries based on that size</div>
+        <div class="test1">
+            <div class="content">
+                Container Query Test
+                <div class="cq-units">Units: 1cqw, 1cqh, 1.5cqmin</div>
+            </div>
+            <div class="dimensions">Size info</div>
+            <div class="debug">Debug info</div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>Test 2: Conflict - Width: 300px, Height: 150px, aspect-ratio: 1</h3>
+        <div class="info">Expected: aspect-ratio should be ignored, resulting in 300×150px rectangle. How do container query units calculate?</div>
+        <div class="test2">
+            <div class="content">
+                Container Query Test
+                <div class="cq-units">Units: 1cqw, 1cqh, 1.5cqmin</div>
+            </div>
+            <div class="dimensions">Size info</div>
+            <div class="debug">Debug info</div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>Test 3: Height-first - Height: 200px + aspect-ratio: 1</h3>
+        <div class="info">Expected: 200×200px square, width derived from height</div>
+        <div class="test3">
+            <div class="content">
+                Container Query Test
+                <div class="cq-units">Units: 1cqw, 1cqh, 1.5cqmin</div>
+            </div>
+            <div class="dimensions">Size info</div>
+            <div class="debug">Debug info</div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>Test 4: Max constraint override - width/height: 300px, max-height: 150px</h3>
+        <div class="info">Expected: 300×150px due to max-height constraint overriding aspect-ratio</div>
+        <div class="test4">
+            <div class="content">
+                Container Query Test
+                <div class="cq-units">Units: 1cqw, 1cqh, 1.5cqmin</div>
+            </div>
+            <div class="dimensions">Size info</div>
+            <div class="debug">Debug info</div>
+        </div>
+    </div>
+
+    <script>
+        // Add dynamic size information
+        function updateDimensions() {
+            const tests = document.querySelectorAll('[class*="test"]');
+            tests.forEach((test, index) => {
+                const rect = test.getBoundingClientRect();
+                const computed = window.getComputedStyle(test);
+                
+                const dimensionsEl = test.querySelector('.dimensions');
+                const debugEl = test.querySelector('.debug');
+                
+                if (dimensionsEl) {
+                    dimensionsEl.textContent = `${Math.round(rect.width)}×${Math.round(rect.height)}px`;
+                }
+                
+                if (debugEl) {
+                    // Calculate what 1cqw and 1cqh should be
+                    const cqw = rect.width / 100;
+                    const cqh = rect.height / 100;
+                    const cqmin = Math.min(cqw, cqh);
+                    
+                    debugEl.innerHTML = `
+                        1cqw = ${cqw.toFixed(2)}px<br>
+                        1cqh = ${cqh.toFixed(2)}px<br>
+                        1cqmin = ${cqmin.toFixed(2)}px
+                    `;
+                }
+            });
+        }
+        
+        // Update on load and resize
+        window.addEventListener('load', updateDimensions);
+        window.addEventListener('resize', updateDimensions);
+        
+        // Initial update
+        updateDimensions();
+    </script>
+</body>
+</html>
